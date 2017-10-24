@@ -104,10 +104,7 @@ public final class LocalExpert implements Parcelable
   }
 
   @Override
-  public int describeContents()
-  {
-    return 0;
-  }
+  public int describeContents() { return 0; }
 
   int getId() { return mId; }
 
@@ -122,15 +119,9 @@ public final class LocalExpert implements Parcelable
 
   double getRating() { return mRating; }
 
-  int getReviewCount()
-  {
-    return mReviewCount;
-  }
+  int getReviewCount() { return mReviewCount; }
 
-  double getPrice()
-  {
-    return mPrice;
-  }
+  double getPrice() { return mPrice; }
 
   @NonNull
   String getCurrency() { return mCurrency; }
@@ -145,10 +136,7 @@ public final class LocalExpert implements Parcelable
   String getOfferDescription() { return mOfferDescription; }
 
   @NonNull
-  String getPageUrl()
-  {
-    return mPageUrl;
-  }
+  String getPageUrl() { return mPageUrl;}
 
   @NonNull
   String getPhotoUrl() { return mPhotoUrl; }

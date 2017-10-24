@@ -6,7 +6,7 @@
 
 namespace
 {
-jclass g_localsClass;
+jclass g_localsClass = nullptr;
 jobject g_localsInstance;
 jmethodID g_onLocalsReceivedMethod;
 jmethodID g_onLocalsErrorReceivedMethod;
@@ -14,11 +14,11 @@ jclass g_localExpertClass;
 jmethodID g_localExpertConstructor;
 jclass g_localErrorClass;
 jmethodID g_localErrorConstructor;
-uint64_t g_lastRequestId;
+uint64_t g_lastRequestId = 0;
 
 void PrepareClassRefs(JNIEnv * env)
 {
-  if (g_localsClass)
+  if (g_localsClass != nullptr)
     return;
 
   g_localsClass = jni::GetGlobalClassRef(env, "com/mapswithme/maps/locals/Locals");
@@ -47,7 +47,6 @@ void PrepareClassRefs(JNIEnv * env)
   g_localErrorClass = jni::GetGlobalClassRef(env, "com/mapswithme/maps/locals/LocalError");
   g_localErrorConstructor = jni::GetConstructorID(env, g_localErrorClass,
                                                   "(ILjava/lang/String;)V");
-  g_lastRequestId = 0;
 }
 
 void OnLocalsSuccess(uint64_t requestId, std::vector<locals::LocalExpert> const & locals,

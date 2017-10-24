@@ -614,6 +614,17 @@ int Framework::ToDoAfterUpdate() const
   return (int) m_work.ToDoAfterUpdate();
 }
 
+uint64_t Framework::GetLocals(JNIEnv * env, jobject policy, double lat, double lon,
+                              locals::LocalsSuccessCallback const & successFn,
+                              locals::LocalsErrorCallback const & errorFn)
+{
+  std::string const langStr = languages::GetCurrentNorm();
+  size_t constexpr kResultsOnPage = 5;
+  size_t constexpr kPageNumber = 1;
+  auto api = NativeFramework()->GetLocalsApi(ToNativeNetworkPolicy(env, policy));
+  return api->GetLocals(lat, lon, langStr, kResultsOnPage, kPageNumber, successFn, errorFn);
+}
+
 void Framework::LogLocalAdsEvent(local_ads::EventType type, double lat, double lon, uint16_t accuracy)
 {
   auto const & info = g_framework->GetPlacePageInfo();

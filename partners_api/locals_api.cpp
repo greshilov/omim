@@ -55,7 +55,15 @@ void ParseLocals(std::string const & src, std::vector<LocalExpert> & locals,
     FromJSONObject(item, "currency", local.m_currency);
     FromJSONObject(item, "about_me", local.m_aboutExpert);
     FromJSONObject(item, "i_will_show_you", local.m_offerDescription);
-    locals.push_back(move(local));
+
+    // Rescale rating to (0.0; 10.0] range. Rating 0.0 is invalid.
+    static double const kInvalidRating = -1.0;
+    if (local.m_rating == 0.0)
+      local.m_rating = kInvalidRating;
+    else
+      local.m_rating *= 2.0;
+
+    locals.push_back(std::move(local));
   }
 }
 }  // namespace
@@ -149,5 +157,4 @@ std::string DebugPrint(LocalExpert const & localExpert)
       << "motto: " << localExpert.m_motto << std::endl;
   return out.str();
 }
-
 }  // namespace locals

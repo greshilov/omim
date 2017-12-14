@@ -33,6 +33,7 @@
 #include "base/checked_cast.hpp"
 #include "base/logging.hpp"
 #include "base/macros.hpp"
+#include "base/stl_helpers.hpp"
 #include "base/string_utils.hpp"
 
 #include <algorithm>
@@ -79,20 +80,6 @@ struct IsValidVisitor
 
 private:
   bool m_isValid = true;
-};
-
-struct IsEmptyVisitor
-{
-  template <typename Cont>
-  void operator()(Cont const & c, char const * /* name */ )
-  {
-    m_isEmpty = m_isEmpty && c.empty();
-  }
-
-  bool IsEmpty() const { return m_isEmpty; }
-
-private:
-  bool m_isEmpty = true;
 };
 
 struct IsUniqueVisitor
@@ -243,9 +230,15 @@ void DeserializerFromJson::operator()(FeatureIdentifiers & id, char const * name
   auto const it = m_osmIdToFeatureIds.find(osmId);
   if (it != m_osmIdToFeatureIds.cend())
   {
-    CHECK_EQUAL(it->second.size(), 1, ("Osm id:", osmId, "(encoded", osmId.EncodedId(),
-                 ") from transit graph corresponds to", it->second.size(), "features."
-                 "But osm id should be represented be one feature."));
+    CHECK_GREATER_OR_EQUAL(it->second.size(), 1, ("Osm id:", osmId, "(encoded", osmId.EncodedId(),
+                            ") from transit graph does not correspond to any feature."));
+    if (it->second.size() != 1)
+    {
+      // Note. |osmId| corresponds several feature ids. It may happen in case of stops;
+      // if a stop is present as relation. It's a rare case.
+      LOG(LWARNING, ("Osm id:", osmId, "(encoded", osmId.EncodedId(), "corresponds to",
+                     it->second.size(), "feature ids."));
+    }
     id.SetFeatureId(it->second[0]);
   }
   id.SetOsmId(osmId.EncodedId());
@@ -273,6 +266,19 @@ void GraphData::DeserializeFromJson(my::Json const & root, OsmIdToFeatureIdsMap 
 {
   DeserializerFromJson deserializer(root.get(), mapping);
   Visit(deserializer);
+
+  // Removes equivalent edges from |m_edges|. If there are several equivalent edges only
+  // the most lightweight edge is left.
+  // Note. It's possible that two stops are connected with the same line several times
+  // in the same direction. It happens in Oslo metro (T-banen):
+  // https://en.wikipedia.org/wiki/Oslo_Metro#/media/File:Oslo_Metro_Map.svg branch 5.
+  my::SortUnique(m_edges,
+                 [](Edge const & e1, Edge const & e2) {
+                   if (e1 != e2)
+                     return e1 < e2;
+                   return e1.GetWeight() < e2.GetWeight();
+                 },
+                 [](Edge const & e1, Edge const & e2) { return e1 == e2; });
 }
 
 void GraphData::Serialize(Writer & writer) const
@@ -386,9 +392,9 @@ bool GraphData::IsValid() const
 
 bool GraphData::IsEmpty() const
 {
-  IsEmptyVisitor v;
-  Visit(v);
-  return v.IsEmpty();
+  // Note. |m_transfers| may be empty if GraphData instance is not empty.
+  return m_stops.empty() || m_gates.empty() || m_edges.empty() || m_lines.empty()
+      || m_shapes.empty() || m_networks.empty();
 }
 
 void GraphData::Sort()
@@ -416,7 +422,7 @@ void GraphData::CalculateBestPedestrianSegments(string const & mwmPath, TCountry
   // Creating IndexRouter.
   SingleMwmIndex index(mwmPath);
 
-  auto infoGetter = storage::CountryInfoReader::CreateCountryInfoReader(GetPlatform());
+  auto infoGetter = storage::CountryInfoReader::CreateCountryInfoReaderOneComponentMwms(GetPlatform());
   CHECK(infoGetter, ());
 
   auto const countryFileGetter = [&infoGetter](m2::PointD const & pt) {

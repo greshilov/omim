@@ -19,23 +19,15 @@ import java.util.List;
 public class ViatorAdapterStrategy
     extends RegularAdapterStrategy<Items.ViatorItem>
 {
-
   ViatorAdapterStrategy(@NonNull ViatorProduct[] products, @Nullable String moreUrl)
   {
     super(convertItems(products), new Items.ViatorMoreItem(moreUrl));
   }
 
-  public ViatorAdapterStrategy(@NonNull List<Items.ViatorItem> items,
-                               @Nullable Items.ViatorItem moreItem)
-  {
-    super(items, moreItem);
-  }
-
   @NonNull
   @Override
-  protected Holders.BaseViewHolder<Items.ViatorItem> createProductViewHodler(@NonNull ViewGroup parent,
-                                                                             int viewType,
-                                                                             @NonNull GalleryAdapter adapter)
+  protected Holders.BaseViewHolder<Items.ViatorItem> createProductViewHodler
+      (@NonNull ViewGroup parent, int viewType, @NonNull GalleryAdapter<?, Items.ViatorItem> adapter)
   {
     View view = LayoutInflater.from(parent.getContext())
                               .inflate(R.layout.item_viator_product, parent,
@@ -45,18 +37,12 @@ public class ViatorAdapterStrategy
 
   @NonNull
   @Override
-  protected Holders.BaseViewHolder<Items.ViatorItem> createMoreProductsViewHolder(
-      @NonNull ViewGroup parent, int viewType, @NonNull GalleryAdapter adapter)
+  protected Holders.BaseViewHolder<Items.ViatorItem> createMoreProductsViewHolder
+      (@NonNull ViewGroup parent, int viewType, @NonNull GalleryAdapter<?, Items.ViatorItem> adapter)
   {
     View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_viator_more, parent,
                                                                  false);
     return new Holders.ViatorMoreItemViewHolder(view, mItems, adapter);
-  }
-
-  @Override
-  protected void onBindViewHolder(Holders.BaseViewHolder<Items.ViatorItem> holder, int position)
-  {
-    holder.bind(mItems.get(position));
   }
 
   @NonNull

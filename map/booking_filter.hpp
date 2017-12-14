@@ -3,7 +3,11 @@
 #include "map/booking_filter_availability_params.hpp"
 #include "map/booking_filter_cache.hpp"
 
+#include "base/macros.hpp"
+
+#include <functional>
 #include <memory>
+#include <vector>
 
 class Index;
 
@@ -18,6 +22,9 @@ class Api;
 
 namespace filter
 {
+
+using FillSearchMarksCallback =  std::function<void(std::vector<FeatureID> availableHotelsSorted)>;
+
 class Filter
 {
 public:
@@ -26,7 +33,15 @@ public:
   void FilterAvailability(search::Results const & results,
                           availability::internal::Params const & params);
 
+  void OnParamsUpdated(AvailabilityParams const & params);
+
+  void GetAvailableFeaturesFromCache(search::Results const & results,
+                                     FillSearchMarksCallback const & callback);
+
 private:
+
+  void UpdateAvailabilityParams(AvailabilityParams params);
+
   Index const & m_index;
   Api const & m_api;
 
@@ -35,6 +50,8 @@ private:
   CachePtr m_availabilityCache = std::make_shared<availability::Cache>();
 
   AvailabilityParams m_currentParams;
+
+  DISALLOW_COPY_AND_MOVE(Filter);
 };
 }  // namespace filter
 }  // namespace booking

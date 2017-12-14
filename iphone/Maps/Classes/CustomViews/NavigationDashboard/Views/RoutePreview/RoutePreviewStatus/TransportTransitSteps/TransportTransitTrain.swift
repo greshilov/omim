@@ -1,9 +1,9 @@
 final class TransportTransitTrain: TransportTransitCell {
   enum Config {
-    static let backgroundCornerRadius = CGFloat(4)
-    static let labelTextColor = UIColor.white
+    static let backgroundCornerRadius: CGFloat = 4
+    static var labelTextColor: UIColor { return .white }
     static let labelTextFont = UIFont.bold12()!
-    static let labelTrailing = CGFloat(4)
+    static let labelTrailing: CGFloat = 4
   }
 
   @IBOutlet private weak var background: UIView! {
@@ -39,9 +39,9 @@ final class TransportTransitTrain: TransportTransitCell {
     case .intermediatePoint: fallthrough
     case .pedestrian: fatalError()
     case .train: image.image = #imageLiteral(resourceName: "ic_20px_route_planning_train")
-    case .subway: fallthrough
-    case .lightRail: fallthrough
-    case .monorail: image.image = #imageLiteral(resourceName: "ic_20px_route_planning_metro")
+    case .subway: image.image = #imageLiteral(resourceName: "ic_20px_route_planning_metro")
+    case .lightRail: image.image = #imageLiteral(resourceName: "ic_20px_route_planning_lightrail")
+    case .monorail: image.image = #imageLiteral(resourceName: "ic_20px_route_planning_monorail")
     }
     background.backgroundColor = step.color
 

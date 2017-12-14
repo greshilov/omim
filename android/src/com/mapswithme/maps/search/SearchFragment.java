@@ -191,10 +191,7 @@ public class SearchFragment extends BaseMwmFragment
     {
       super.clear();
       if (mFilterController != null)
-      {
-        mFilterController.setFilter(null);
-        mFilterController.updateFilterButtonVisibility(false);
-      }
+        mFilterController.resetFilter();
     }
   }
 
@@ -377,7 +374,7 @@ public class SearchFragment extends BaseMwmFragment
     mResults = (RecyclerView) mResultsFrame.findViewById(R.id.recycler);
     setRecyclerScrollListener(mResults);
     mResultsPlaceholder = (PlaceholderView) mResultsFrame.findViewById(R.id.placeholder);
-    mResultsPlaceholder.setContent(R.drawable.img_search_nothing_found_light,
+    mResultsPlaceholder.setContent(R.drawable.img_mappyny,
                                    R.string.search_not_found, R.string.search_not_found_query);
 
     mFilterElevation = view.findViewById(R.id.filter_elevation);
@@ -551,6 +548,9 @@ public class SearchFragment extends BaseMwmFragment
                                             result.lat, result.lon);
       RoutingController.get().onPoiSelected(point);
     }
+
+    if (mFilterController != null)
+      mFilterController.resetFilter();
 
     mToolbarController.deactivate();
 

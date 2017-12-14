@@ -4,6 +4,7 @@
 #import "MWMDiscoveryTapDelegate.h"
 #import "MWMRoutePoint+CPP.h"
 #import "MWMRouter.h"
+#import "Statistics.h"
 #import "UIKitCategories.h"
 
 #include "DiscoveryControllerViewModel.hpp"
@@ -79,6 +80,7 @@ struct Callback
 
 @property(weak, nonatomic) IBOutlet UITableView * tableView;
 @property(nonatomic) MWMDiscoveryTableManager * tableManager;
+@property(nonatomic) MWMDiscoveryMode mode;
 
 @end
 
@@ -114,9 +116,14 @@ struct Callback
                                                                  delegate:self
                                                                     model:move(callback)];
 
-  vector<ItemType> types{ItemType::Viator, ItemType::Attractions, ItemType::Cafes};
+  auto getTypes = [](MWMDiscoveryMode m) -> vector<ItemType> {
+    if (m == MWMDiscoveryModeOnline)
+      return {ItemType::Viator, ItemType::Attractions, ItemType::Cafes, ItemType::LocalExperts};
+    return {ItemType::Attractions, ItemType::Cafes};
+  };
+
+  vector<ItemType> types = getTypes(self.mode);
   [self.tableManager loadItems:types];
-  // TODO: check connection before ask for viator and local experts
   ClientParams p;
   p.m_itemTypes = move(types);
   GetFramework().Discover(move(p), m_callback,
@@ -154,6 +161,13 @@ struct Callback
     break;
   }
   }
+
+  auto const categoryAndProvider = StatCategoryAndProvider(type);
+  [Statistics logEvent:kStatDiscoveryButtonItemClick
+        withParameters:@{kStatCategory : categoryAndProvider.first,
+                         kStatProvider : categoryAndProvider.second,
+                         kStatDestination : kStatPlacePage,
+                         kStatPosition : @(index + 1)}];
 }
 
 - (void)routeToItem:(ItemType const)type atIndex:(size_t const)index
@@ -167,8 +181,16 @@ struct Callback
                                                    subtitle:@(item.GetFeatureType().c_str())
                                                        type:MWMRoutePointTypeFinish
                                           intermediateIndex:0];
-  [MWMRouter buildToPoint:pt bestRouter:YES];
+  [MWMRouter setType:MWMRouterTypePedestrian];
+  [MWMRouter buildToPoint:pt bestRouter:NO];
   [self.navigationController popViewControllerAnimated:YES];
+
+  auto const categoryAndProvider = StatCategoryAndProvider(type);
+  [Statistics logEvent:kStatDiscoveryButtonItemClick
+        withParameters:@{kStatCategory : categoryAndProvider.first,
+                         kStatProvider : categoryAndProvider.second,
+                         kStatDestination : kStatRouting,
+                         kStatPosition : @(index + 1)}];
 }
 
 - (void)openURLForItem:(discovery::ItemType const)type

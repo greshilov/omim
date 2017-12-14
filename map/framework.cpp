@@ -882,7 +882,6 @@ void Framework::FillInfoFromFeatureType(FeatureType const & ft, place_page::Info
     info.SetSponsoredType(place_page::SponsoredType::Viator);
     auto const & sponsoredId = info.GetMetadata().Get(feature::Metadata::FMD_SPONSORED_ID);
     info.SetSponsoredUrl(viator::Api::GetCityUrl(sponsoredId));
-    info.SetPreviewIsExtended();
   }
   else if (ftypes::IsHotelChecker::Instance()(ft))
   {
@@ -896,7 +895,6 @@ void Framework::FillInfoFromFeatureType(FeatureType const & ft, place_page::Info
   {
     info.SetSponsoredType(SponsoredType::Cian);
     info.SetSponsoredUrl(cian::Api::GetMainPageUrl());
-    info.SetPreviewIsExtended();
   }
   else if (ftypes::IsThorChecker::Instance()(ft) &&
            !info.GetMetadata().Get(feature::Metadata::FMD_RATING).empty())
@@ -1014,6 +1012,22 @@ void Framework::ShowTrack(Track const & track)
   rect.Scale(kPaddingScale);
 
   ShowRect(rect);
+}
+
+void Framework::ShowFeatureByMercator(m2::PointD const & pt)
+{
+  if (m_drapeEngine != nullptr)
+  {
+    m_drapeEngine->SetModelViewCenter(pt, scales::GetUpperComfortScale(), true /* isAnim */,
+                                      true /* trackVisibleViewport */);
+  }
+
+  place_page::Info info;
+  std::string name;
+  m_bmManager.SelectionMark()->SetPtOrg(pt);
+  FillPointInfo(pt, name, info);
+  ActivateMapSelection(false, df::SelectionShape::OBJECT_POI, info);
+  m_lastTapEvent = MakeTapEvent(info.GetMercator(), info.GetID(), TapEvent::Source::Other);
 }
 
 void Framework::ClearBookmarks()
@@ -1514,7 +1528,7 @@ size_t Framework::ShowSearchResults(search::Results const & results)
     return count;
   }
 
-  FillSearchResultsMarks(results);
+  FillSearchResultsMarks(true /* clear */, results);
 
   // Setup viewport according to results.
   m2::AnyRectD viewport = m_currentModelView.GlobalRect();
@@ -1560,17 +1574,22 @@ size_t Framework::ShowSearchResults(search::Results const & results)
   return count;
 }
 
-void Framework::FillSearchResultsMarks(search::Results const & results)
+void Framework::FillSearchResultsMarks(bool clear, search::Results const & results)
 {
-  FillSearchResultsMarks(results.begin(), results.end());
+  FillSearchResultsMarks(clear, results.begin(), results.end());
 }
 
-void Framework::FillSearchResultsMarks(search::Results::ConstIter begin,
-                                       search::Results::ConstIter end)
+void Framework::FillSearchResultsMarks(bool clear, search::Results::ConstIter begin,
+                                       search::Results::ConstIter end,
+                                       SearchMarkPostProcesing fn /* = nullptr */)
 {
   UserMarkNotificationGuard guard(m_bmManager, UserMark::Type::SEARCH);
-  guard.m_controller.SetIsVisible(true);
-  guard.m_controller.SetIsDrawable(true);
+
+  auto & controller = guard.m_controller;
+  if (clear)
+    controller.Clear();
+  controller.SetIsVisible(true);
+  controller.SetIsDrawable(true);
 
   for (auto it = begin; it != end; ++it)
   {
@@ -1578,7 +1597,7 @@ void Framework::FillSearchResultsMarks(search::Results::ConstIter begin,
     if (!r.HasPoint())
       continue;
 
-    auto mark = static_cast<SearchMarkPoint *>(guard.m_controller.CreateUserMark(r.GetFeatureCenter()));
+    auto mark = static_cast<SearchMarkPoint *>(controller.CreateUserMark(r.GetFeatureCenter()));
     ASSERT_EQUAL(mark->GetMarkType(), UserMark::Type::SEARCH, ());
     auto const isFeature = r.GetResultType() == search::Result::RESULT_FEATURE;
     if (isFeature)
@@ -1601,8 +1620,8 @@ void Framework::FillSearchResultsMarks(search::Results::ConstIter begin,
     if (r.m_metadata.m_isSponsoredHotel)
       mark->SetMarkType(SearchMarkType::Booking);
 
-    if (GetSearchAPI().GetSponsoredMode() == SearchAPI::SponsoredMode::Booking)
-      mark->SetPreparing(true /* isPreparing */);
+    if (fn)
+      fn(*mark);
   }
 }
 
@@ -3133,9 +3152,37 @@ void Framework::SetSearchDisplacementModeEnabled(bool enabled)
   SetDisplacementMode(DisplacementModeManager::SLOT_INTERACTIVE_SEARCH, enabled /* show */);
 }
 
-void Framework::ShowViewportSearchResults(search::Results const & results)
+void Framework::ShowViewportSearchResults(bool clear, search::Results::ConstIter begin,
+                                          search::Results::ConstIter end)
 {
-  FillSearchResultsMarks(results);
+  if (GetSearchAPI().GetSponsoredMode() != SearchAPI::SponsoredMode::Booking)
+  {
+    FillSearchResultsMarks(clear, begin, end);
+    return;
+  }
+
+  search::Results results;
+  results.AddResultsNoChecks(begin, end);
+
+  auto const fillCallback = [this, clear, results] (std::vector<FeatureID> featuresSorted)
+  {
+    auto const postProcessing = [featuresSorted] (SearchMarkPoint & mark)
+    {
+      auto const & id = mark.GetFeatureID();
+
+      if (!id.IsValid())
+        return;
+
+      auto const isAvailable =
+        std::binary_search(featuresSorted.cbegin(), featuresSorted.cend(), id);
+
+      mark.SetPreparing(!isAvailable);
+    };
+
+    FillSearchResultsMarks(clear, results.begin(), results.end(), postProcessing);
+  };
+
+  m_bookingFilter.GetAvailableFeaturesFromCache(results, fillCallback);
 }
 
 void Framework::ClearViewportSearchResults()
@@ -3400,4 +3447,9 @@ void Framework::FilterSearchResultsOnBooking(booking::filter::availability::Para
   };
 
   m_bookingFilter.FilterAvailability(results, paramsInternal);
+}
+
+void Framework::OnBookingFilterParamsUpdate(booking::AvailabilityParams const & params)
+{
+  m_bookingFilter.OnParamsUpdated(params);
 }

@@ -58,6 +58,11 @@ uint32_t VisualParams::GetGlyphSdfScale() const
   return (m_visualScale <= 1.0) ? 3 : 4;
 }
 
+bool VisualParams::IsSdfPrefered() const
+{
+  return m_visualScale >= kHdpiScale;
+}
+
 uint32_t VisualParams::GetGlyphBaseSize() const
 {
   return 22;
@@ -310,6 +315,15 @@ float InterpolateByZoomLevels(int index, float lerpCoef, std::vector<float> cons
   ASSERT_GREATER(values.size(), scales::UPPER_STYLE_SCALE, ());
   if (index < scales::UPPER_STYLE_SCALE)
     return values[index] + lerpCoef * (values[index + 1] - values[index]);
+  return values[scales::UPPER_STYLE_SCALE];
+}
+
+m2::PointF InterpolateByZoomLevels(int index, float lerpCoef, std::vector<m2::PointF> const & values)
+{
+  ASSERT_GREATER_OR_EQUAL(index, 0, ());
+  ASSERT_GREATER(values.size(), scales::UPPER_STYLE_SCALE, ());
+  if (index < scales::UPPER_STYLE_SCALE)
+    return values[index] + (values[index + 1] - values[index]) * lerpCoef;
   return values[scales::UPPER_STYLE_SCALE];
 }
 

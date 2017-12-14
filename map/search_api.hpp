@@ -33,6 +33,7 @@ struct DownloaderSearchParams;
 
 namespace booking
 {
+struct AvailabilityParams;
 namespace filter
 {
 namespace availability
@@ -63,7 +64,10 @@ public:
 
     virtual void SetSearchDisplacementModeEnabled(bool /* enabled */) {}
 
-    virtual void ShowViewportSearchResults(search::Results const & /* results */) {}
+    virtual void ShowViewportSearchResults(bool clear, search::Results::ConstIter begin,
+                                           search::Results::ConstIter end)
+    {
+    }
 
     virtual void ClearViewportSearchResults() {}
 
@@ -80,6 +84,10 @@ public:
 
     virtual void FilterSearchResultsOnBooking(booking::filter::availability::Params const & params,
                                               search::Results const & results, bool inViewport)
+    {
+    }
+
+    virtual void OnBookingFilterParamsUpdate(booking::AvailabilityParams const & params)
     {
     }
   };
@@ -120,8 +128,8 @@ public:
   void RunUITask(std::function<void()> fn) override;
   void SetHotelDisplacementMode() override;
   bool IsViewportSearchActive() const override;
-  void ShowViewportSearchResults(search::Results const & results) override;
-  void ClearViewportSearchResults() override;
+  void ShowViewportSearchResults(bool clear, search::Results::ConstIter begin,
+                                 search::Results::ConstIter end) override;
   bool IsLocalAdsCustomer(search::Result const & result) const override;
 
 private:

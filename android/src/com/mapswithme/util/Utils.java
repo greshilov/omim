@@ -211,8 +211,11 @@ public class Utils
     activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.Url.TWITTER_MAPSME_HTTP)));
   }
 
-  public static void openUrl(@NonNull Context activity, @NonNull String url)
+  public static void openUrl(@NonNull Context activity, @Nullable String url)
   {
+    if (TextUtils.isEmpty(url))
+      return;
+
     final Intent intent = new Intent(Intent.ACTION_VIEW);
     if (!url.startsWith("http://") && !url.startsWith("https://"))
       url = "http://" + url;
@@ -380,15 +383,15 @@ public class Utils
     }
   }
 
-  public static void showWirelessSettings(@NonNull Context context)
+  public static void showSystemSettings(@NonNull Context context)
   {
     try
     {
-      context.startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+      context.startActivity(new Intent(Settings.ACTION_SETTINGS));
     }
     catch (ActivityNotFoundException e)
     {
-      LOGGER.e(TAG, "Failed to open wireless settings", e);
+      LOGGER.e(TAG, "Failed to open system settings", e);
     }
   }
 

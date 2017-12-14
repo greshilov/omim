@@ -153,8 +153,16 @@ void CacheUserMarks(TileKey const & tileKey, ref_ptr<dp::TextureManager> texture
             params.m_minVisibleScale = renderInfo.m_minZoom;
             params.m_specialDisplacement = SpecialDisplacement::UserMark;
             params.m_specialPriority = renderInfo.m_priority;
-            ColoredSymbolShape(renderInfo.m_pivot, params, tileKey,
-                               kStartUserMarkOverlayIndex + renderInfo.m_index).Draw(&batcher, textures);
+            if (renderInfo.m_symbolSizes != nullptr)
+            {
+              ColoredSymbolShape(renderInfo.m_pivot, params, tileKey, kStartUserMarkOverlayIndex + renderInfo.m_index,
+                                 *renderInfo.m_symbolSizes.get()).Draw(&batcher, textures);
+            }
+            else
+            {
+              ColoredSymbolShape(renderInfo.m_pivot, params, tileKey,
+                                 kStartUserMarkOverlayIndex + renderInfo.m_index).Draw(&batcher, textures);
+            }
             break;
           }
         }
@@ -226,28 +234,42 @@ void CacheUserMarks(TileKey const & tileKey, ref_ptr<dp::TextureManager> texture
         params.m_titleDecl.m_secondaryTextFont.m_size *= vs;
         params.m_titleDecl.m_primaryOffset *= vs;
         params.m_titleDecl.m_secondaryOffset *= vs;
+        bool const isSdf = df::VisualParams::Instance().IsSdfPrefered();
+        params.m_titleDecl.m_primaryTextFont.m_isSdf =
+            params.m_titleDecl.m_primaryTextFont.m_outlineColor != dp::Color::Transparent() ? true : isSdf;
+        params.m_titleDecl.m_secondaryTextFont.m_isSdf =
+            params.m_titleDecl.m_secondaryTextFont.m_outlineColor != dp::Color::Transparent() ? true : isSdf;
 
         params.m_depth = renderInfo.m_depth;
         params.m_depthLayer = renderInfo.m_depthLayer;
         params.m_minVisibleScale = renderInfo.m_minZoom;
 
-        uint32_t overlayIndex = 0;
+        uint32_t const overlayIndex = kStartUserMarkOverlayIndex + renderInfo.m_index;
         if (renderInfo.m_hasTitlePriority)
         {
           params.m_specialDisplacement = SpecialDisplacement::UserMark;
           params.m_specialPriority = renderInfo.m_priority;
-          overlayIndex = kStartUserMarkOverlayIndex + renderInfo.m_index;
-
           params.m_startOverlayRank = dp::OverlayRank0;
-          if (renderInfo.m_symbolNames != nullptr)
-            params.m_startOverlayRank++;
-          if (renderInfo.m_coloredSymbols != nullptr)
-            params.m_startOverlayRank++;
-          ASSERT_LESS(params.m_startOverlayRank, dp::OverlayRanksCount, ());
+          if (renderInfo.m_hasSymbolPriority)
+          {
+            if (renderInfo.m_symbolNames != nullptr)
+              params.m_startOverlayRank++;
+            if (renderInfo.m_coloredSymbols != nullptr)
+              params.m_startOverlayRank++;
+            ASSERT_LESS(params.m_startOverlayRank, dp::OverlayRanksCount, ());
+          }
         }
 
-        TextShape(renderInfo.m_pivot, params, tileKey,
-                  symbolSize, renderInfo.m_anchor, overlayIndex).Draw(&batcher, textures);
+        if (renderInfo.m_symbolSizes != nullptr)
+        {
+          TextShape(renderInfo.m_pivot, params, tileKey,
+                    *renderInfo.m_symbolSizes.get(), renderInfo.m_anchor, overlayIndex).Draw(&batcher, textures);
+        }
+        else
+        {
+          TextShape(renderInfo.m_pivot, params, tileKey,
+                    symbolSize, renderInfo.m_anchor, overlayIndex).Draw(&batcher, textures);
+        }
       }
     }
 

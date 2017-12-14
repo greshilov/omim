@@ -85,13 +85,44 @@ void RouteMarkPoint::SetPassed(bool isPassed)
   m_markData.m_isPassed = isPassed;
 }
 
+uint16_t RouteMarkPoint::GetPriority() const
+{
+  switch (m_markData.m_pointType)
+  {
+    case RouteMarkType::Start: return static_cast<uint16_t>(Priority::RouteStart);
+    case RouteMarkType::Finish: return static_cast<uint16_t>(Priority::RouteFinish);
+    case RouteMarkType::Intermediate:
+    {
+      switch (m_markData.m_intermediateIndex)
+      {
+        case 0: return static_cast<uint16_t>(Priority::RouteIntermediateA);
+        case 1: return static_cast<uint16_t>(Priority::RouteIntermediateB);
+        default: return static_cast<uint16_t>(Priority::RouteIntermediateC);
+      }
+    }
+  }
+}
+
+uint32_t RouteMarkPoint::GetIndex() const
+{
+  switch (m_markData.m_pointType)
+  {
+    case RouteMarkType::Start: return 0;
+    case RouteMarkType::Finish: return 1;
+    case RouteMarkType::Intermediate: return static_cast<uint32_t >(m_markData.m_intermediateIndex + 2);
+  }
+}
+
 void RouteMarkPoint::SetMarkData(RouteMarkData && data)
 {
   SetDirty();
   m_markData = std::move(data);
   m_titleDecl.m_primaryText = m_markData.m_title;
   if (!m_titleDecl.m_primaryText.empty())
+  {
     m_titleDecl.m_secondaryText = m_markData.m_subTitle;
+    m_titleDecl.m_secondaryOptional = true;
+  }
   else
     m_titleDecl.m_secondaryText.clear();
 }
@@ -120,19 +151,19 @@ drape_ptr<df::UserPointMark::SymbolNameZoomInfo> RouteMarkPoint::GetSymbolNames(
   std::string name;
   switch (m_markData.m_pointType)
   {
-  case RouteMarkType::Start: name = "route-point-start";  break;
-  case RouteMarkType::Intermediate:
-  {
-    switch (m_markData.m_intermediateIndex)
+    case RouteMarkType::Start: name = "route-point-start";  break;
+    case RouteMarkType::Finish: name = "route-point-finish"; break;
+    case RouteMarkType::Intermediate:
     {
-    case 0: name = "route-point-a"; break;
-    case 1: name = "route-point-b"; break;
-    case 2: name = "route-point-c"; break;
-    default: name = ""; break;
+      switch (m_markData.m_intermediateIndex)
+      {
+      case 0: name = "route-point-a"; break;
+      case 1: name = "route-point-b"; break;
+      case 2: name = "route-point-c"; break;
+      default: name = ""; break;
+      }
+      break;
     }
-    break;
-  }
-  case RouteMarkType::Finish: name = "route-point-finish"; break;
   }
   auto symbol = make_unique_dp<SymbolNameZoomInfo>();
   symbol->insert(std::make_pair(1 /* zoomLevel */, name));
@@ -443,6 +474,18 @@ drape_ptr<df::UserPointMark::ColoredSymbolZoomInfo> TransitMark::GetColoredSymbo
   if (m_coloredSymbols.empty())
     return nullptr;
   return make_unique_dp<ColoredSymbolZoomInfo>(m_coloredSymbols);
+}
+
+void TransitMark::SetSymbolSizes(SymbolSizes const & symbolSizes)
+{
+  m_symbolSizes = symbolSizes;
+}
+
+drape_ptr<df::UserPointMark::SymbolSizes> TransitMark::GetSymbolSizes() const
+{
+  if (m_symbolSizes.empty())
+    return nullptr;
+  return make_unique_dp<SymbolSizes>(m_symbolSizes);
 }
 
 drape_ptr<df::UserPointMark::SymbolNameZoomInfo> TransitMark::GetSymbolNames() const

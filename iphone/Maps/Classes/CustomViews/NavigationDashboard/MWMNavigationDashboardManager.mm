@@ -107,6 +107,8 @@ using Observers = NSHashTable<Observer>;
   [_navigationControlView mwm_refreshUI];
   [_baseRoutePreviewStatus mwm_refreshUI];
   [_transportRoutePreviewStatus mwm_refreshUI];
+  _etaAttributes = nil;
+  _etaSecondaryAttributes = nil;
 }
 
 - (void)onNavigationInfoUpdated
@@ -138,7 +140,13 @@ using Observers = NSHashTable<Observer>;
     self.state = MWMNavigationDashboardStateReady;
 }
 
-- (void)onRoutePointsUpdated { [self.navigationInfoView updateToastView]; }
+- (void)onRoutePointsUpdated
+{
+  if (self.state == MWMNavigationDashboardStateHidden)
+    self.state = MWMNavigationDashboardStatePrepare;
+  [self.navigationInfoView updateToastView];
+}
+
 #pragma mark - State changes
 
 - (void)stateHidden

@@ -38,7 +38,6 @@ import com.mapswithme.util.statistics.AlohaHelper;
 import com.mapswithme.util.statistics.Statistics;
 
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static com.mapswithme.util.statistics.Statistics.EventName.ROUTING_POINT_ADD;
@@ -416,6 +415,13 @@ public class RoutingController implements TaxiManager.TaxiListener
     prepare(startPoint, endPoint, fromApi);
   }
 
+  public void prepare(boolean canUseMyPositionAsStart, @Nullable MapObject endPoint,
+                      @Framework.RouterType int type, boolean fromApi)
+  {
+    MapObject startPoint = canUseMyPositionAsStart ? LocationHelper.INSTANCE.getMyPosition() : null;
+    prepare(startPoint, endPoint, type, fromApi);
+  }
+
   public void prepare(@Nullable MapObject startPoint, @Nullable MapObject endPoint)
   {
     prepare(startPoint, endPoint, false);
@@ -494,6 +500,9 @@ public class RoutingController implements TaxiManager.TaxiListener
   {
     mLogger.d(TAG, "start");
 
+    // This saving is needed just for situation when the user starts navigation
+    // and then app crashes. So, the previous route will be restored on the next app launch.
+    saveRoute();
 
     MapObject my = LocationHelper.INSTANCE.getMyPosition();
 

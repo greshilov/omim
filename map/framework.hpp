@@ -332,6 +332,7 @@ public:
 
   void ShowBookmark(BookmarkAndCategory const & bnc);
   void ShowTrack(Track const & track);
+  void ShowFeatureByMercator(m2::PointD const & pt);
 
   void ClearBookmarks();
 
@@ -349,7 +350,8 @@ public:
   // SearchAPI::Delegate overrides:
   void RunUITask(function<void()> fn) override;
   void SetSearchDisplacementModeEnabled(bool enabled) override;
-  void ShowViewportSearchResults(search::Results const & results) override;
+  void ShowViewportSearchResults(bool clear, search::Results::ConstIter begin,
+                                 search::Results::ConstIter end) override;
   void ClearViewportSearchResults() override;
   boost::optional<m2::PointD> GetCurrentPosition() const override;
   bool ParseSearchQueryCommand(search::SearchParams const & params) override;
@@ -548,8 +550,11 @@ public:
 
   size_t ShowSearchResults(search::Results const & results);
 
-  void FillSearchResultsMarks(search::Results const & results);
-  void FillSearchResultsMarks(search::Results::ConstIter begin, search::Results::ConstIter end);
+  using SearchMarkPostProcesing = function<void(SearchMarkPoint & mark)>;
+
+  void FillSearchResultsMarks(bool clear, search::Results const & results);
+  void FillSearchResultsMarks(bool clear, search::Results::ConstIter begin,
+                              search::Results::ConstIter end, SearchMarkPostProcesing fn = nullptr);
   void ClearSearchResultsMarks();
 
   list<TSearchRequest> const & GetLastSearchQueries() const { return m_searchQuerySaver.Get(); }
@@ -846,6 +851,7 @@ private:
 public:
   void FilterSearchResultsOnBooking(booking::filter::availability::Params const & params,
                                     search::Results const & results, bool inViewport) override;
+  void OnBookingFilterParamsUpdate(booking::AvailabilityParams const & params) override;
 
 private:
   // m_discoveryManager must be bellow m_searchApi, m_viatorApi, m_localsApi

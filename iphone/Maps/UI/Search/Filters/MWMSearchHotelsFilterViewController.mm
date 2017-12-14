@@ -137,6 +137,15 @@ void configButton(UIButton * button, NSString * primaryText, NSString * secondar
   [self setNeedsStatusBarAppearanceUpdate];
 }
 
+- (void)reset
+{
+  self.check = nil;
+  self.rating = nil;
+  self.price = nil;
+  self.type = nil;
+  [self.tableView reloadData];
+}
+
 - (void)refreshStatusBarAppearance
 {
   self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
@@ -293,7 +302,7 @@ void configButton(UIButton * button, NSString * primaryText, NSString * secondar
     selectedDate = self.checkOutDate;
     minimumDate =
         [[[NSDate date] laterDate:self.checkInDate] dateByAddingTimeInterval:kDayInterval];
-    maximumDate = [minimumDate dateByAddingTimeInterval:k30DaysInterval];
+    maximumDate = [self.checkInDate dateByAddingTimeInterval:k30DaysInterval];
   }
 
   auto picker = [[ActionSheetDatePicker alloc] initWithTitle:title
@@ -306,6 +315,12 @@ void configButton(UIButton * button, NSString * primaryText, NSString * secondar
                                                       origin:button];
   picker.tapDismissAction = TapActionCancel;
   picker.hideCancel = YES;
+  auto doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                                  target:nil
+                                                                  action:nil];
+  [doneButton setTitleTextAttributes:@{NSForegroundColorAttributeName: [UIColor linkBlue]}
+                            forState:UIControlStateNormal];
+  [picker setDoneButton:doneButton];
   [picker showActionSheetPicker];
 }
 

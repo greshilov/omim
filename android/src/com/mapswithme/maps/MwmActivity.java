@@ -1,6 +1,7 @@
 package com.mapswithme.maps;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -44,6 +45,7 @@ import com.mapswithme.maps.bookmarks.data.BookmarkManager;
 import com.mapswithme.maps.bookmarks.data.FeatureId;
 import com.mapswithme.maps.bookmarks.data.MapObject;
 import com.mapswithme.maps.discovery.DiscoveryActivity;
+import com.mapswithme.maps.discovery.DiscoveryFragment;
 import com.mapswithme.maps.downloader.DownloaderActivity;
 import com.mapswithme.maps.downloader.DownloaderFragment;
 import com.mapswithme.maps.downloader.MapManager;
@@ -105,7 +107,6 @@ import com.mapswithme.util.statistics.AlohaHelper;
 import com.mapswithme.util.statistics.PlacePageTracker;
 import com.mapswithme.util.statistics.Statistics;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Stack;
@@ -125,7 +126,8 @@ public class MwmActivity extends BaseMwmFragmentActivity
                                  NavigationButtonsAnimationController.OnTranslationChangedListener,
                                  RoutingPlanInplaceController.RoutingPlanListener,
                                  RoutingBottomMenuListener,
-                                 BookmarkManager.BookmarksLoadingListener
+                                 BookmarkManager.BookmarksLoadingListener,
+                                 DiscoveryFragment.DiscoveryListener
 {
   public static final String EXTRA_TASK = "map_task";
   public static final String EXTRA_LAUNCH_BY_DEEP_LINK = "launch_by_deep_link";
@@ -137,13 +139,15 @@ public class MwmActivity extends BaseMwmFragmentActivity
                                                      MigrationFragment.class.getName(),
                                                      RoutingPlanFragment.class.getName(),
                                                      EditorHostFragment.class.getName(),
-                                                     ReportFragment.class.getName() };
+                                                     ReportFragment.class.getName(),
+                                                     DiscoveryFragment.class.getName() };
   // Instance state
   private static final String STATE_PP = "PpState";
   private static final String STATE_MAP_OBJECT = "MapObject";
   private static final String EXTRA_LOCATION_DIALOG_IS_ANNOYING = "LOCATION_DIALOG_IS_ANNOYING";
 
-  private static final int LOCATION_REQUEST = 1;
+  private static final int REQ_CODE_LOCATION_PERMISSION = 1;
+  private static final int REQ_CODE_DISCOVERY = 2;
 
   // Map tasks that we run AFTER rendering initialized
   private final Stack<MapTask> mTasks = new Stack<>();
@@ -213,7 +217,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
       if (!PermissionsUtils.isLocationGranted())
       {
         if (PermissionsUtils.isLocationExplanationNeeded(MwmActivity.this))
-          PermissionsUtils.requestLocationPermission(MwmActivity.this, LOCATION_REQUEST);
+          PermissionsUtils.requestLocationPermission(MwmActivity.this, REQ_CODE_LOCATION_PERMISSION);
         else
           Toast.makeText(MwmActivity.this, R.string.enable_location_services, Toast.LENGTH_SHORT)
                .show();
@@ -847,7 +851,7 @@ public class MwmActivity extends BaseMwmFragmentActivity
           break;
 
         case DISCOVERY:
-          DiscoveryActivity.start(MwmActivity.this);
+          showDiscovery();
           break;
 
         case BOOKMARKS:
@@ -907,6 +911,20 @@ public class MwmActivity extends BaseMwmFragmentActivity
 
     if (mPlacePage != null && mPlacePage.isDocked())
       mPlacePage.setLeftAnimationTrackListener(mMainMenu.getLeftAnimationTrackListener());
+  }
+
+  private void showDiscovery()
+  {
+    if (mIsFragmentContainer)
+    {
+      replaceFragment(DiscoveryFragment.class, null, null);
+    }
+    else
+    {
+      Intent i = new Intent(MwmActivity.this, DiscoveryActivity.class);
+      startActivityForResult(i, REQ_CODE_DISCOVERY);
+    }
+    Statistics.INSTANCE.trackDiscoveryOpen();
   }
 
   private void initOnmapDownloader()
@@ -1029,11 +1047,73 @@ public class MwmActivity extends BaseMwmFragmentActivity
   }
 
   @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data)
+  {
+    super.onActivityResult(requestCode, resultCode, data);
+
+    if (resultCode != Activity.RESULT_OK)
+      return;
+
+    switch (requestCode)
+    {
+      case REQ_CODE_DISCOVERY:
+        handleDiscoveryResult(data);
+        break;
+    }
+  }
+
+  private void handleDiscoveryResult(@NonNull Intent data)
+  {
+    final MapObject destination = data.getParcelableExtra(DiscoveryActivity
+                                                              .EXTRA_DISCOVERY_OBJECT);
+    if (destination == null)
+      return;
+
+    String action = data.getAction();
+    if (TextUtils.isEmpty(action))
+      return;
+
+    if (action.equals(DiscoveryActivity.ACTION_ROUTE_TO))
+      onRouteToDiscoveredObject(destination);
+    else
+      onShowDiscoveredObject(destination);
+  }
+
+  @Override
+  public void onRouteToDiscoveredObject(@NonNull final MapObject object)
+  {
+    addTask(new MapTask()
+    {
+      @Override
+      public boolean run(MwmActivity target)
+      {
+        RoutingController.get().setRouterType(Framework.ROUTER_TYPE_PEDESTRIAN);
+        RoutingController.get().prepare(true, object);
+        return false;
+      }
+    });
+  }
+
+  @Override
+  public void onShowDiscoveredObject(@NonNull final MapObject object)
+  {
+    addTask(new MapTask()
+    {
+      @Override
+      public boolean run(MwmActivity target)
+      {
+        Framework.nativeShowFeatureByLatLon(object.getLat(), object.getLon());
+        return false;
+      }
+    });
+  }
+
+  @Override
   public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                          @NonNull int[] grantResults)
   {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    if (requestCode != LOCATION_REQUEST || grantResults.length == 0)
+    if (requestCode != REQ_CODE_LOCATION_PERMISSION || grantResults.length == 0)
       return;
 
     PermissionsResult result = PermissionsUtils.computePermissionsResult(permissions, grantResults);
@@ -2325,9 +2405,9 @@ public class MwmActivity extends BaseMwmFragmentActivity
                                        TextUtils.isEmpty(addr) ? "" : addr, "", lat, lon);
     }
 
-    BuildRouteTask(double latTo, double lonTo)
+    BuildRouteTask(double latTo, double lonTo, @Nullable String router)
     {
-      this(latTo, lonTo, null, null, null, null, null);
+      this(latTo, lonTo, null, null, null, null, router);
     }
 
     BuildRouteTask(double latTo, double lonTo, @Nullable String saddr,
@@ -2385,6 +2465,12 @@ public class MwmActivity extends BaseMwmFragmentActivity
       {
         RoutingController.get().prepare(fromLatLon(mLatFrom, mLonFrom, mSaddr),
                                         fromLatLon(mLatTo, mLonTo, mDaddr), true /* fromApi */);
+      }
+      else if (routerType > 0)
+      {
+        RoutingController.get().prepare(true /* canUseMyPositionAsStart */,
+                                        fromLatLon(mLatTo, mLonTo, mDaddr), routerType,
+                                        true /* fromApi */);
       }
       else
       {

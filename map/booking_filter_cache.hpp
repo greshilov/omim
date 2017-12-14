@@ -64,8 +64,6 @@ private:
   size_t const m_maxCount = 1000;
   // Do not use aging when |m_expiryPeriodSeconds| is equal to zero.
   size_t const m_expiryPeriodSeconds = 60;
-
-  DISALLOW_COPY_AND_MOVE(Cache);
 };
 
 std::string DebugPrint(Cache::HotelStatus status);

@@ -261,24 +261,27 @@ if (BUILD_DESIGNER)
   execute_process(
     COMMAND cp ${OMIM_ROOT}/tools/python/recalculate_geom_index.py ${RESOURCES_FOLDER}
     COMMAND cp ${OMIM_ROOT}/tools/python/generate_styles_override.py ${RESOURCES_FOLDER}
-    COMMAND cp -rf ${OMIM_ROOT}/tools/kothic ${RESOURCES_FOLDER}/kothic/
+    COMMAND cp -R ${OMIM_ROOT}/tools/kothic ${RESOURCES_FOLDER}
     COMMAND cp -f ${OMIM_ROOT}/tools/python/stylesheet/drules_info.py ${RESOURCES_FOLDER}/kothic/src/
-    COMMAND cp -rf ${OMIM_ROOT}/tools/python/stylesheet/ ${RESOURCES_FOLDER}/kothic/src/
+    #COMMAND cp -R ${OMIM_ROOT}/tools/python/stylesheet/ ${RESOURCES_FOLDER}/kothic/src/
     COMMAND cp -f ${OMIM_ROOT}/3party/protobuf/protobuf-3.3.0-py2.7.egg ${RESOURCES_FOLDER}/kothic/
   )
 
   # Generate DMG
   install(DIRECTORY ${DATA_DIR}/styles DESTINATION .)
+  message(python "${OMIM_PATH}/tools/macdeployqtfix/macdeployqtfix.py -q -nl ${BUNDLE_FOLDER} ${CMAKE_PREFIX_PATH}")
   install(CODE "
     execute_process(
       COMMAND macdeployqt \"${BUNDLE_FOLDER}\"
+      QTPATH=\"$(otool -L \"${BUNDLE_FOLDER}/Contents/Frameworks/QtGui.framework/QtGui\" | grep QtCore | sed -e 's/^[[:space:]]*\(.*\)lib\/QtCore.framework.*$/\\\\1/')\"
+      COMMAND python \"${OMIM_ROOT}/tools/macdeployqtfix/macdeployqtfix.py\" -q -nl \"${BUNDLE_FOLDER}/Contents/MacOS/${BUNDLE_NAME}\" \"$QTPATH\"
     )
-    file(WRITE \"${RESOURCES_FOLDER}/qt.conf\" \"\")
+
     file(GLOB_RECURSE QTPLUGINS
     \"${BUNDLE_FOLDER}/Contents/PlugIns/*/*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
      )
     include(BundleUtilities)
-    fixup_bundle(\"${BUNDLE_FOLDER}\" \"\${QTPLUGINS}\" \"${Qt5_DIR}/lib\")
+    fixup_bundle(\"${BUNDLE_FOLDER}\" \"\${QTPLUGINS}\" \"${CMAKE_PREFIX_PATH}/lib\")
     ")
   install(TARGETS ${PROJECT_NAME} DESTINATION .)
 

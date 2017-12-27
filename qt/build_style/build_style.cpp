@@ -55,9 +55,10 @@ void BuildAndApply(QString const & mapcssFile)
   if (hasSymbols)
   {
     auto future = std::async(BuildSkins, styleDir, outputDir);
+    LOG(LDEBUG, ("Time for future!"));
     BuildDrawingRules(mapcssFile, outputDir);
     future.get(); // may rethrow exception from the BuildSkin
-
+    LOG(LDEBUG, ("Future get!"));
     ApplyDrawingRules(outputDir);
     ApplySkins(outputDir);
   }

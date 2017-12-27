@@ -13,6 +13,8 @@
 
 #include <QtCore/QDir>
 
+#include "base/logging.hpp"
+
 namespace
 {
 enum SkinType
@@ -52,9 +54,7 @@ inline bool SkinCoorrectColor(SkinType s) { return std::get<2>(g_skinInfo[s]); }
 
 QString GetSkinGeneratorPath()
 {
-  QString path = GetExternalPath("skin_generator", "skin_generator.app/Contents/MacOS", "");
-  if (path.isEmpty())
-    path = GetExternalPath("skin_generator_tool", "skin_generator_tool.app/Contents/MacOS", "");
+  QString path = GetExternalPath("skin_generator_tool", "", "");
   ASSERT(QFileInfo::exists(path), (path.toStdString()));
   return path;
 }
@@ -153,10 +153,11 @@ void BuildSkinImpl(QString const & styleDir, QString const & suffix,
   if (colorCorrection)
     params << "--colorCorrection true";
   QString const cmd = params.join(' ');
-
+  LOG(LDEBUG, ('Command', to_string(cmd)));
   // Run the script
   auto res = ExecProcess(cmd);
 
+  LOG(LDEBUG, ('Error: ', to_string(res.first).c_str()));
   // If script returns non zero then it is error
   if (res.first != 0)
   {

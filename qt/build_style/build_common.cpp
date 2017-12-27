@@ -8,6 +8,8 @@
 #include <QtCore/QProcess>
 #include <QtCore/QRegExp>
 
+#include "base/logging.hpp"
+
 #include <exception>
 
 std::pair<int, QString> ExecProcess(QString const & cmd, QProcessEnvironment const * env)
@@ -29,6 +31,7 @@ std::pair<int, QString> ExecProcess(QString const & cmd, QProcessEnvironment con
     output += error;
   }
 
+  LOG(LDEBUG, (to_string(exitCode)));
   return std::make_pair(exitCode, output);
 }
 

@@ -6,17 +6,17 @@ First, do not forget to initialize a cloned repository, see
 ## Desktop
 
 You would need Clang, Boost and Qt 5. With that, just run `omim/tools/unix/build_omim.sh`.
-It will build both debug and release versions to `omim/../omim-build-<target>`, as
-well as OSRM backend for generating maps. Command-line switches are:
+It will build both debug and release versions to `omim/../omim-<target>`.
+Command-line switches are:
 
 * `-r` to build a release version
 * `-d` to build a debug version
-* `-o` to build OSRM backend
+* `-s` to skip desktop app building
 * `-c` to delete target directories before building
+* `-p` directory for built binaries
 
-To build a generator tool only, set `CONFIG=gtool` variable. To skip building tests,
-use `CONFIG=no-tests`. If you have Qt installed in an unusual directory, use
-`QMAKE` variable.
+You can specify target to build by positional arguments: `build_omim.sh target1 target2 ...`.
+For example to build generator tool only, use: `build_omim.sh -cr generator_tool`.
 
 When using a lot of maps, increase open files limit, which is only 256 on Mac OS X.
 Use `ulimit -n 2000`, put it into `~/.bash_profile` to apply it to all new sessions.
@@ -29,18 +29,12 @@ and run
 
 The `build_omim.sh` script basically runs these commands:
 
-    qmake omim.pro -spec linux-clang-libc++ CONFIG+=debug
-    make -j <number_of_processes>
+    cmake ../omim
+    make -j <number_of_processes> <targets_to_build>
 
 It will compile binaries to the `out` subdirectory of the current directory.
 You might need to export `BOOST_INCLUDEDIR` variable with a path to Boost's
 `include` directory.
-
-To build the OSRM backend, create `omim/3party/osrm/osrm-backend/build`
-directory, and from within it, run:
-
-    cmake -DBOOST_ROOT=<where_is_your_Boost> ..
-    make
 
 ### Ubuntu 14.04
 
@@ -99,7 +93,7 @@ Then do a git clone, run `configure.sh` and compile with linux-clang spec:
 ### Debian Jessie
 
 Example [Dockerfile](debian/Dockerfile). In instruction have been compiled Generator Tool and, for routing indices, OSRM backend. I used this command:
-	
+
     CONFIG=gtool omim/tools/unix/build_omim.sh -cro
 
 

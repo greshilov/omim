@@ -140,7 +140,7 @@ android {
       cmake {
         cppFlags '-fexceptions', '-frtti', '-m32'
         cFlags '-ffunction-sections', '-fdata-sections', '-Wno-extern-c-compat', '-m32'
-        arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static', "-DOS=$osName"
+        arguments '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=c++_static', "-DOS=$osName", "-DSKIP_TESTS=ON"
       }
     }
 
@@ -409,9 +409,11 @@ def buildTypes = [[ndkType: 'release', cppType: "production", flags: propRelease
 def unalignedFonts = "${propObbFontsOutput}.unaligned"
 def unalignedWorlds = "${propObbWorldsOutput}.unaligned"
 
-task obbClean(type: Delete) << {
-  [propObbFontsOutput, propObbWorldsOutput, unalignedFonts, unalignedWorlds].each { file ->
-    delete file
+task obbClean(type: Delete) {
+  doLast {
+    [propObbFontsOutput, propObbWorldsOutput, unalignedFonts, unalignedWorlds].each { file ->
+      delete file
+    }
   }
 }
 

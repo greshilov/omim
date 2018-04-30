@@ -84,7 +84,7 @@ else() # neither iPhone nor Android
     location_service.hpp
     marketing_service_dummy.cpp
     network_policy_dummy.cpp
-    platform_qt.cpp
+    #platform_qt.cpp
     wifi_info.hpp
     wifi_location_service.cpp
   )

@@ -36,4 +36,4 @@
 + (UIColor *)partner20Background;
 + (UIColor *)partner20TextColor;
 
-@end 
+@end

@@ -159,16 +159,16 @@
   <symbol minX="480" maxX="520" minY="421" maxY="461" name="bbq-m"/>
   <symbol minX="520" maxX="560" minY="421" maxY="461" name="subway-panama-m"/>
   <symbol minX="560" maxX="600" minY="421" maxY="461" name="partner10-l"/>
-  <symbol minX="600" maxX="640" minY="421" maxY="461" name="partner11-l"/>
-  <symbol minX="640" maxX="680" minY="421" maxY="461" name="partner12-l"/>
-  <symbol minX="680" maxX="720" minY="421" maxY="461" name="partner12"/>
-  <symbol minX="720" maxX="760" minY="421" maxY="461" name="partner18-l"/>
-  <symbol minX="760" maxX="800" minY="421" maxY="461" name="partner19-l"/>
-  <symbol minX="800" maxX="840" minY="421" maxY="461" name="partner2-l"/>
-  <symbol minX="840" maxX="880" minY="421" maxY="461" name="partner20-l"/>
-  <symbol minX="880" maxX="920" minY="421" maxY="461" name="partner4-l"/>
-  <symbol minX="920" maxX="960" minY="421" maxY="461" name="partner6-l"/>
-  <symbol minX="960" maxX="1000" minY="421" maxY="461" name="partner7-l"/>
+  <symbol minX="600" maxX="640" minY="421" maxY="461" name="partner12-l"/>
+  <symbol minX="640" maxX="680" minY="421" maxY="461" name="partner12"/>
+  <symbol minX="680" maxX="720" minY="421" maxY="461" name="partner18-l"/>
+  <symbol minX="720" maxX="760" minY="421" maxY="461" name="partner19-l"/>
+  <symbol minX="760" maxX="800" minY="421" maxY="461" name="partner2-l"/>
+  <symbol minX="800" maxX="840" minY="421" maxY="461" name="partner20-l"/>
+  <symbol minX="840" maxX="872" minY="421" maxY="461" name="partner3-l"/>
+  <symbol minX="872" maxX="912" minY="421" maxY="461" name="partner4-l"/>
+  <symbol minX="912" maxX="952" minY="421" maxY="461" name="partner6-l"/>
+  <symbol minX="952" maxX="992" minY="421" maxY="461" name="partner7-l"/>
   <symbol minX="0" maxX="40" minY="461" maxY="501" name="partner8-l"/>
   <symbol minX="40" maxX="80" minY="461" maxY="501" name="partner9-l"/>
   <symbol minX="80" maxX="120" minY="461" maxY="501" name="bcontrol-m"/>

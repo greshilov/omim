@@ -159,26 +159,26 @@
   <symbol minX="476" maxX="544" minY="595" maxY="663" name="bbq-m"/>
   <symbol minX="544" maxX="612" minY="595" maxY="663" name="subway-perugia-m"/>
   <symbol minX="612" maxX="680" minY="595" maxY="663" name="partner10-l"/>
-  <symbol minX="680" maxX="748" minY="595" maxY="663" name="partner11-l"/>
-  <symbol minX="748" maxX="816" minY="595" maxY="663" name="partner12-l"/>
-  <symbol minX="816" maxX="884" minY="595" maxY="663" name="partner12"/>
-  <symbol minX="884" maxX="952" minY="595" maxY="663" name="partner18-l"/>
-  <symbol minX="952" maxX="1020" minY="595" maxY="663" name="partner19-l"/>
-  <symbol minX="1020" maxX="1088" minY="595" maxY="663" name="partner2-l"/>
-  <symbol minX="1088" maxX="1156" minY="595" maxY="663" name="partner20-l"/>
-  <symbol minX="1156" maxX="1224" minY="595" maxY="663" name="partner4-l"/>
-  <symbol minX="1224" maxX="1292" minY="595" maxY="663" name="partner6-l"/>
-  <symbol minX="1292" maxX="1360" minY="595" maxY="663" name="partner7-l"/>
-  <symbol minX="1360" maxX="1428" minY="595" maxY="663" name="partner8-l"/>
-  <symbol minX="1428" maxX="1496" minY="595" maxY="663" name="partner9-l"/>
-  <symbol minX="1496" maxX="1564" minY="595" maxY="663" name="bcontrol-m"/>
-  <symbol minX="1564" maxX="1632" minY="595" maxY="663" name="beach-m"/>
-  <symbol minX="1632" maxX="1700" minY="595" maxY="663" name="petshop-m"/>
-  <symbol minX="1700" maxX="1768" minY="595" maxY="663" name="pharmacy-m"/>
-  <symbol minX="1768" maxX="1836" minY="595" maxY="663" name="phone-m"/>
-  <symbol minX="1836" maxX="1904" minY="595" maxY="663" name="photo-shop-m"/>
-  <symbol minX="1904" maxX="1972" minY="595" maxY="663" name="picnic-m"/>
-  <symbol minX="1972" maxX="2040" minY="595" maxY="663" name="picnic_table-m"/>
+  <symbol minX="680" maxX="748" minY="595" maxY="663" name="partner12-l"/>
+  <symbol minX="748" maxX="816" minY="595" maxY="663" name="partner12"/>
+  <symbol minX="816" maxX="884" minY="595" maxY="663" name="partner18-l"/>
+  <symbol minX="884" maxX="952" minY="595" maxY="663" name="partner19-l"/>
+  <symbol minX="952" maxX="1020" minY="595" maxY="663" name="partner2-l"/>
+  <symbol minX="1020" maxX="1088" minY="595" maxY="663" name="partner20-l"/>
+  <symbol minX="1088" maxX="1141" minY="595" maxY="663" name="partner3-l"/>
+  <symbol minX="1141" maxX="1209" minY="595" maxY="663" name="partner4-l"/>
+  <symbol minX="1209" maxX="1277" minY="595" maxY="663" name="partner6-l"/>
+  <symbol minX="1277" maxX="1345" minY="595" maxY="663" name="partner7-l"/>
+  <symbol minX="1345" maxX="1413" minY="595" maxY="663" name="partner8-l"/>
+  <symbol minX="1413" maxX="1481" minY="595" maxY="663" name="partner9-l"/>
+  <symbol minX="1481" maxX="1549" minY="595" maxY="663" name="bcontrol-m"/>
+  <symbol minX="1549" maxX="1617" minY="595" maxY="663" name="beach-m"/>
+  <symbol minX="1617" maxX="1685" minY="595" maxY="663" name="petshop-m"/>
+  <symbol minX="1685" maxX="1753" minY="595" maxY="663" name="pharmacy-m"/>
+  <symbol minX="1753" maxX="1821" minY="595" maxY="663" name="phone-m"/>
+  <symbol minX="1821" maxX="1889" minY="595" maxY="663" name="photo-shop-m"/>
+  <symbol minX="1889" maxX="1957" minY="595" maxY="663" name="picnic-m"/>
+  <symbol minX="1957" maxX="2025" minY="595" maxY="663" name="picnic_table-m"/>
   <symbol minX="0" maxX="68" minY="663" maxY="731" name="pitch-m"/>
   <symbol minX="68" maxX="136" minY="663" maxY="731" name="place-of-worship-m"/>
   <symbol minX="136" maxX="204" minY="663" maxY="731" name="beauty-m"/>

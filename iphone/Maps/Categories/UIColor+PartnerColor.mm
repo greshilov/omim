@@ -3,21 +3,45 @@
 #import "UIColor+PartnerColor.h"
 
 @implementation UIColor (PartnerColor)
++ (UIColor *)partner1Background
+{
+  return [UIColor colorWithRed:scaled(144) green:scaled(19) blue:scaled(254) alpha:1];
+}
++ (UIColor *)partner1TextColor
+{
+  return [UIColor colorWithRed:scaled(0) green:scaled(0) blue:scaled(0) alpha:1];
+}
++ (UIColor *)partner2Background
+{
+  return [UIColor colorWithRed:scaled(0) green:scaled(0) blue:scaled(0) alpha:100];
+}
++ (UIColor *)partner2TextColor
+{
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
+}
 + (UIColor *)partner3Background
 {
   return [UIColor colorWithRed:scaled(230) green:scaled(23) blue:scaled(23) alpha:100];
 }
 + (UIColor *)partner3TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner4Background
 {
-  return UIColor.blackColor;
+  return [UIColor colorWithRed:scaled(0) green:scaled(0) blue:scaled(0) alpha:100];
 }
 + (UIColor *)partner4TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
+}
++ (UIColor *)partner5Background
+{
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:1];
+}
++ (UIColor *)partner5TextColor
+{
+  return [UIColor colorWithRed:scaled(0) green:scaled(0) blue:scaled(0) alpha:1];
 }
 + (UIColor *)partner6Background
 {
@@ -25,7 +49,7 @@
 }
 + (UIColor *)partner6TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner7Background
 {
@@ -33,7 +57,7 @@
 }
 + (UIColor *)partner7TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner8Background
 {
@@ -41,7 +65,7 @@
 }
 + (UIColor *)partner8TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner9Background
 {
@@ -49,7 +73,7 @@
 }
 + (UIColor *)partner9TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner10Background
 {
@@ -57,7 +81,7 @@
 }
 + (UIColor *)partner10TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner11Background
 {
@@ -65,7 +89,7 @@
 }
 + (UIColor *)partner11TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner12Background
 {
@@ -73,47 +97,23 @@
 }
 + (UIColor *)partner12TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner13Background
 {
-  return [UIColor colorWithRed:scaled(55) green:scaled(37) blue:scaled(43) alpha:100];
+  return [UIColor colorWithRed:scaled(139) green:scaled(87) blue:scaled(42) alpha:1];
 }
 + (UIColor *)partner13TextColor
 {
-  return UIColor.whiteColor;
-}
-+ (UIColor *)partner14Background
-{
-  return UIColor.blackColor;
-}
-+ (UIColor *)partner14TextColor
-{
-  return UIColor.whiteColor;
-}
-+ (UIColor *)partner15Background
-{
-  return UIColor.blackColor;
-}
-+ (UIColor *)partner15TextColor
-{
-  return UIColor.whiteColor;
-}
-+ (UIColor *)partner16Background
-{
-  return UIColor.blackColor;
-}
-+ (UIColor *)partner16TextColor
-{
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(0) green:scaled(0) blue:scaled(0) alpha:1];
 }
 + (UIColor *)partner17Background
 {
-  return UIColor.blackColor;
+  return [UIColor colorWithRed:scaled(0) green:scaled(0) blue:scaled(0) alpha:100];
 }
 + (UIColor *)partner17TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner18Background
 {
@@ -121,7 +121,7 @@
 }
 + (UIColor *)partner18TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner19Background
 {
@@ -129,7 +129,7 @@
 }
 + (UIColor *)partner19TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
 + (UIColor *)partner20Background
 {
@@ -137,6 +137,7 @@
 }
 + (UIColor *)partner20TextColor
 {
-  return UIColor.whiteColor;
+  return [UIColor colorWithRed:scaled(255) green:scaled(255) blue:scaled(255) alpha:100];
 }
+
 @end

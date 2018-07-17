@@ -69,10 +69,12 @@ PreRankerResult::PreRankerResult(FeatureID const & id, PreRankingInfo const & in
 }
 
 // static
-bool PreRankerResult::LessRank(PreRankerResult const & r1, PreRankerResult const & r2)
+bool PreRankerResult::LessRankAndPopularity(PreRankerResult const & r1, PreRankerResult const & r2)
 {
   if (r1.m_info.m_rank != r2.m_info.m_rank)
     return r1.m_info.m_rank > r2.m_info.m_rank;
+  if (r1.m_info.m_popularity != r2.m_info.m_popularity)
+    return r1.m_info.m_popularity > r2.m_info.m_popularity;
   return r1.m_info.m_distanceToPivot < r2.m_info.m_distanceToPivot;
 }
 
@@ -141,11 +143,7 @@ uint32_t RankerResult::GetBestType(set<uint32_t> const * pPrefferedTypes) const
     }
   }
 
-  // Do type truncate (2-level is enough for search results) only for
-  // non-preffered types (types from categories leave original).
-  uint32_t type = m_types.GetBestType();
-  ftype::TruncValue(type, 2);
-  return type;
+  return m_types.GetBestType();
 }
 
 // RankerResult::RegionInfo ------------------------------------------------------------------------

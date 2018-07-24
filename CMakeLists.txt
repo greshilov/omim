@@ -232,6 +232,15 @@ if (USE_PCH)
   )
 endif()
 
+if (APPLE)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -dead_strip")
+endif()
+
+if (UNIX)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --gc-sections")
+endif()
+
+
 # Include subdirectories
 add_subdirectory(3party/agg)
 add_subdirectory(3party/bsdiff-courgette)
@@ -263,7 +272,7 @@ add_compile_options(
 add_clang_compile_options("-Wshorten-64-to-32")
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
     CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
-  add_gcc_cpp_compile_options("-Wno-noexcept-type")
+  add_gcc_cpp_compile_options("-fdata-sections -ffunction-sections")
 endif()
 
 add_subdirectory(base)
